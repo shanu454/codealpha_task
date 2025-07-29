@@ -1,0 +1,57 @@
+# Import libraries
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler 
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+# Step 1: Load the dataset
+df = pd.read_csv("C:\\Users\\ayesh\\Downloads\\Iris.csv")
+
+# Step 2: Inspect the dataset
+print("First 5 Rows of Dataset:") 
+print(df.head())
+
+# Drop 'Id' column if present
+if 'Id' in df.columns:
+    df = df.drop('Id', axis=1)
+
+# Step 3: Encode the species label
+le = LabelEncoder()
+df['Species'] = le.fit_transform(df['Species'])
+
+# Step 4: Define features and labels
+X = df.drop('Species', axis=1)
+y = df['Species']
+
+# Step 5: Visualize class distribution (Optional)
+sns.countplot(x=y)
+plt.title("Class Distribution")
+plt.show()
+
+# Step 6: Split into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Step 7: Feature scaling
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Step 8: Train model
+model = RandomForestClassifier(random_state=42)
+model.fit(X_train_scaled, y_train)
+
+# Step 9: Predict
+y_pred = model.predict(X_test_scaled)
+
+# Step 10: Evaluation
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=le.classes_))
+
+print("\nAccuracy Score:")
+print(f"{accuracy_score(y_test, y_pred) * 100:.2f}%")
